@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  prometheus: 
+    image: prom/prometheus
+    container_name: prome
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    pid: "host"
+    volumes:
+      - /:/host:ro,rslave
+    command:
+      - --path.rootfs=/host
+  
+  node-exporter1:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter1
+    ports:
+      - "9101:9100"
+    pid: "host"
+    volumes:
+      - /:/host:ro,rslave
+    command:
+      - --path.rootfs=/host
+
+  node-exporter2:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter2
+    ports:
+      - "9102:9100"
+    pid: "host"
+    volumes:
+      - /:/host:ro,rslave
+    command:
+      - --path.rootfs=/host

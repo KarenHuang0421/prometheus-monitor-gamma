@@ -10,7 +10,7 @@ rule_files:
 scrape_configs:
 
   - job_name: remote-node
-    scheme: https
+    scheme: http
     scrape_interval: 5s
     static_configs:
       - targets: 

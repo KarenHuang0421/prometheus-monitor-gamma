@@ -1,0 +1,21 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'a0988423161@gmail.com'
+  smtp_auth_username: 'a0988423161@gmail.com'
+  smtp_auth_password: 'alqxxiyeekhhtdhx'
+
+# 只能有一個
+route:
+  receiver: 'mail-and-line'
+  group_wait: 1s
+  group_interval: 10s
+  repeat_interval: 30s
+
+receivers:
+  - name: 'mail-and-line'
+    email_configs:
+      - to: 'a0988423161@gmail.com'
+        send_resolved: true
+    # webhook_configs:
+    #   - url: 'http://line-relay:3000/alert'
+    #     max_alerts: 0 

@@ -1,50 +1,42 @@
-# my global config
 global:
-  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
-
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
+  scrape_interval: 15s
+  evaluation_interval: 15s 
   external_labels:
     monitor: "codelab-monitor"
 
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
   - 'prometheus.rules.yml'
-  # - "first.rules"
-  # - "second.rules"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: prometheus
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
-    static_configs:
-      - targets: ["localhost:9090"]
-
-  - job_name: docker
-      # metrics_path defaults to '/metrics'
-      # scheme defaults to 'http'.
-
-    static_configs:
-      - targets: ["host.docker.internal:9323"]
-
-  - job_name: node
-
-    # override the global default and scrape every 5 seconds.
+  - job_name: remote-node
+    scheme: https
     scrape_interval: 5s
+    static_configs:
+      - targets: 
+        - 10.0.5.31:9100
+        # - apartment-sao-developments-projected.trycloudflare.com
+
+  - job_name: 'blackbox-exporter'
+    metrics_path: /probe
+    params:
+      module: [http_2xx] 
 
     static_configs:
-      - targets: ["host.docker.internal:9100", "host.docker.internal:9101"]
-        labels: 
-          group: "production"
-      
-      - targets: ["host.docker.internal:9102"]
-        labels: 
-          group: "canary"
+      - targets:
+        - http://10.0.5.31:80
+        # - https://cholesterol-afterwards-calculated-darwin.trycloudflare.com
 
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets: ['alertmanager:9093']
+   

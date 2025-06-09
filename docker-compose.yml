@@ -9,35 +9,16 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml
 
-  node-exporter:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    pid: "host"
-    volumes:
-      - /:/host:ro,rslave
-    command:
-      - --path.rootfs=/host
-  
-  node-exporter1:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: node-exporter1
-    ports:
-      - "9101:9100"
-    pid: "host"
-    volumes:
-      - /:/host:ro,rslave
-    command:
-      - --path.rootfs=/host
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    container_name: fet-front-monitor
+    ports: 
+      - "9115:9115"
 
-  node-exporter2:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: node-exporter2
+  alertmanager:
+    image: prom/alertmanager
+    container_name: fet-alertmanager
     ports:
-      - "9102:9100"
-    pid: "host"
+      - "9093:9093"
     volumes:
-      - /:/host:ro,rslave
-    command:
-      - --path.rootfs=/host
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml

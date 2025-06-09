@@ -22,3 +22,13 @@ services:
       - "9093:9093"
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+
+  line-relay:
+    build:
+      context: ./lineRelay
+    container_name: line-relay
+    env_file:
+      - ./lineRelay/.env
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

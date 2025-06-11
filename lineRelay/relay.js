@@ -1,10 +1,12 @@
 const express = require("express");
 const axios = require("axios");
 
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 
 const app = express();
 app.use(express.json());
+
+const PORT = 3000;
 
 const statusType = {
   resolved: "已解決",
@@ -58,8 +60,6 @@ app.post("/alert", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () =>
-  console.log(
-    `LINE relay listening on http://localhost:${process.env.PORT}/alert`
-  )
+app.listen(PORT, () =>
+  console.log(`LINE relay listening on http://localhost:${PORT}/alert`)
 );

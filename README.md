@@ -16,8 +16,7 @@
 ## Grafana 資訊面板
 啟動後可使用預設帳號 `admin/admin` 登入 Grafana。資料來源已在
 `grafana/provisioning/datasources/datasource.yml` 中指向 Prometheus，目錄
-`grafana/dashboards/` 內的 JSON 會自動匯入為儀表板。若想增加或修改面板，可將新
-的 JSON 放入此目錄並在 `grafana/provisioning/dashboards/dashboards.yml`
+`grafana/dashboards/` 內的 JSON 會自動匯入為儀表板。若想增加或修改面板，可將新的 JSON 放入此目錄並在 `grafana/provisioning/dashboards/dashboards.yml`
 設定路徑，即可在重啟容器後看到。
 
 ## LINE 推播設定
@@ -39,6 +38,7 @@ LINE_CHANNEL_TOKEN=<channel token>
 
 要調整警示閾值，請編輯規則檔內的 `expr`。新增規則時把 YAML 檔放入此目錄即可被
 `prometheus.yml` 的 `rule_files` 設定自動載入。
+## 警示訊息
 更多訊息格式請參考 [官方文件](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)，其他可用 webhook 範例可見 [此處](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)。
 
 ## 檔案結構

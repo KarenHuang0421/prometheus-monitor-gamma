@@ -1,37 +1,50 @@
 # prometheus-monitor-gamma
-以prometheus持續追蹤系統狀態，若有異常則發送警告(Mail, Line)
 
- ```
- ⚠️ 因為IP無法設置為環境變數，所以固定監聽內網的10.0.5.31
- ``` 
+以 Prometheus 監控遠端主機並在異常時發出通知（郵件與 LINE）。預設會監控 10.0.5.31，此 IP 無法以環境變數設定，若欲監控其他主機請修改 `prometheus/prometheus.yml`。
 
 ## 執行方式
-pull預設的develop分支，以`docker compose up`指令啟用
+1. 取得程式碼（預設 develop 分支）。
+2. 執行 `docker compose up -d` 啟動所有服務。
 
-## 使用
-主要透過瀏覽器 `[IP]:[port]` 讀取一些資訊，若要跳異常推播通知，需設定環境變數
+## 服務列表
+- **Prometheus**：<http://localhost:9090>
+- **Blackbox Exporter**：<http://localhost:9115>
+- **Alertmanager**：<http://localhost:9093>
+- **LINE relay**：<http://localhost:3000>
+- **Grafana**：<http://localhost:3001>（預設帳密 `admin/admin`）
 
-### localhost:9090
-為prometheus server，主要用來看圖表資訊, 警示或exporters的狀態，exporter用於輔助監聽
+## Grafana 資訊面板
+啟動後可使用預設帳號 `admin/admin` 登入 Grafana。資料來源已在
+`grafana/provisioning/datasources/datasource.yml` 中指向 Prometheus，目錄
+`grafana/dashboards/` 內的 JSON 會自動匯入為儀表板。若想增加或修改面板，可將新的 JSON 放入此目錄並在 `grafana/provisioning/dashboards/dashboards.yml`
+設定路徑，即可在重啟容器後看到。
 
-### localhost:9115 
-可以監聽 電競機(10.0.5.31)的80 port是否存活
-
-### 10.0.5.31:9100 
-可以看 電競機(10.0.5.31) CPU, memory等狀態
-
-
-## 警告推播
-跳警告的條件設定於prometheus.rules.yml，
-訊息僅有兩種狀態: firing, resolved
-* 詳細訊息格式 [連結](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
-* 其他支援的webhook(Jira, Discord, Telegram...etc) [連結](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)
-
-### Mail
-可自行建立，至alertmanager.yml修改參數，但需設置`雙重驗證`及`應用程式密碼`
+## LINE 推播設定
+建立 LINE Developer 帳號並啟用 Message API，取得下列參數後在 `relays/line/.env` 檔設定：
 ```
-prometheus不支援設定環境變數(僅external_label, http_proxy等)，故直接hardcode在上面
+LINE_TO_USER_ID=<user id>
+LINE_CHANNEL_TOKEN=<channel token>
 ```
+訊息格式可在 `relays/line/relay.js` 中調整。
 
-### Line
-設定建立line developer帳號，至後台設定好Message API，取得`User id`及`Channel access token`，分別為 `LINE_TO_USER_ID` 以及 `LINE_CHANNEL_TOKEN` 環境變數，取得並修改env參數，若需要調整訊息格式可從中繼程式(relay.js)中修改
+## 郵件設定
+於 `alertmanager.yml` 中填入 SMTP 帳號密碼即可使用。因 Prometheus 不支援以環境變數設定此處，帳密將直接寫在設定檔內。
+
+## 警示規則
+警示條件定義在 `prometheus/rules/` 目錄下的 YAML 檔。當前範例包含
+`node_alerts.yml` 與 `blackbox_alerts.yml`：
+* **node_alerts.yml**：監控 CPU、記憶體與磁碟用量，並偵測目標主機是否離線。
+* **blackbox_alerts.yml**：透過 Blackbox Exporter 檢查網站連線是否正常。
+
+要調整警示閾值，請編輯規則檔內的 `expr`。新增規則時把 YAML 檔放入此目錄即可被
+`prometheus.yml` 的 `rule_files` 設定自動載入。
+## 警示訊息
+更多訊息格式請參考 [官方文件](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)，其他可用 webhook 範例可見 [此處](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)。
+
+## 檔案結構
+- `prometheus/`：Prometheus 設定與警示規則。
+- `alertmanager.yml`：Alertmanager 設定。
+- `grafana/`：Grafana dashboards 與自動匯入設定。
+- `relays/line/`：推播 LINE 的中繼服務。
+
+啟動後即可透過瀏覽器連至上述服務查看監控狀態，並在發生問題時收到通知。

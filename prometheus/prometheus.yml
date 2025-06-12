@@ -5,13 +5,13 @@ global:
     monitor: "codelab-monitor"
 
 rule_files:
-  - 'prometheus.rules.yml'
+  - 'rules/*.yml'
 
 scrape_configs:
 
   - job_name: remote-node
     scheme: http
-    scrape_interval: 5s
+    # scrape_interval: 15s
     static_configs:
       - targets: 
         - 10.0.5.31:9100
@@ -38,5 +38,6 @@ scrape_configs:
 alerting:
   alertmanagers:
     - static_configs:
-      - targets: ['alertmanager:9093']
+      - targets: 
+        - alertmanager:9093
    

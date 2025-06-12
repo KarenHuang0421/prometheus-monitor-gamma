@@ -1,7 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());

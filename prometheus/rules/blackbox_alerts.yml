@@ -1,4 +1,3 @@
-# prometheus.rules.yml
 groups:
 - name: blackbox_http
   rules:

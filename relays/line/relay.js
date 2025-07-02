@@ -15,6 +15,8 @@ const statusType = {
 
 const alertName = {
   WebDown: "網站異常",
+  HighCpuUsagePort9182: "CPU 使用率過高",
+  HighMemoryUsagePort9182: "記憶體使用率過高",
 };
 
 app.post("/alert", async (req, res) => {
@@ -31,11 +33,14 @@ app.post("/alert", async (req, res) => {
     const timestamp2 = new Date(a.endsAt).toLocaleString("zh-TW", {
       timeZone: "Asia/Taipei",
     });
+    const timeStampCurrent = new Date().toLocaleString("zh-TW", {
+      timeZone: "Asia/Taipei",
+    });
 
-    if (a.status === "resolved") {
+    if (a.status !== "resolved") {
       return `【${status}】${name}\n\n${
         content || ""
-      }\n\n異常時間：\n${timestamp}`;
+      }\n\n異常時間：\n${timestamp} 至${timeStampCurrent}(當前)`;
     }
 
     return `【${status}】${name}\n\n${
